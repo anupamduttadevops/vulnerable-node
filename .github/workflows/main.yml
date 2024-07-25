@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   build-and-scan:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.5.0
+        uses: docker/setup-buildx-action@v2
 
       - name: Build Docker image
         id: build
@@ -23,25 +23,31 @@ jobs:
           docker build -t vulnerable-image:latest .
 
       - name: Scan Docker image with Trivy
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@v0.24.0
         with:
           image-ref: vulnerable-image:latest
           format: 'json'
-          output: 'trivy-report.json'
+          output: 'trivy-scan-report.json'
+
+      - name: List directory contents for debugging
+        run: ls -la
 
       - name: Upload Trivy report as artifact
         uses: actions/upload-artifact@v4.3.4
         with:
           name: trivy-report
-          path: trivy-report.json
+          path: trivy-scan-report.json
 
       - name: Publish report to DefectDojo
         id: import-scan
         uses: ivanamat/defectdojo-import-scan@v1
         with:
-          token: '76765e6652d7a8f6dd9a58a34795a1e5f712c2f4'  
+          token: '76765e6652d7a8f6dd9a58a34795a1e5f712c2f4'  # Replace with your actual API key
           defectdojo_url: 'http://44.222.200.38:8080'
           file: 'trivy-scan-report.json'
           scan_type: 'Trivy Scan'
-          # engagement: '1'  # Replace with your actual engagement ID
-
+          # engagement: '1'  
+      - name: Show response
+        run: |
+          set -e
+          printf '%s\n' '${{ steps.import-scan.outputs.response }}'

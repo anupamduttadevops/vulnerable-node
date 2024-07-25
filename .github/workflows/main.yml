@@ -45,7 +45,3 @@ jobs:
           scan_type: 'Trivy Scan'
           # engagement: '1'  # Replace with your actual engagement ID
 
-      - name: Show response
-        run: |
-          set -e
-          printf '%s\n' '${{ steps.import-scan.outputs.response }}'

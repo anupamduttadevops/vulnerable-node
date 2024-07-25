@@ -3,7 +3,7 @@ name: Build and Scan Docker Image
 on:
   push:
     branches:
-      - main
+      - masster
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
           docker build -t vulnerable-image:latest .
 
       - name: Scan Docker image with Trivy
-        uses: aquasecurity/trivy-action@v0.24.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: vulnerable-image:latest
           format: 'json'
@@ -42,7 +42,7 @@ jobs:
         id: import-scan
         uses: ivanamat/defectdojo-import-scan@v1
         with:
-          token: '76765e6652d7a8f6dd9a58a34795a1e5f712c2f4'  # Replace with your actual API key
+          token: '76765e6652d7a8f6dd9a58a34795a1e5f712c2f4'  
           defectdojo_url: 'http://44.222.200.38:8080'
           file: 'trivy-scan-report.json'
           scan_type: 'Trivy Scan'

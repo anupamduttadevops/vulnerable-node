@@ -35,12 +35,17 @@ jobs:
           name: trivy-report
           path: trivy-report.json
 
-      - name: Submit Trivy results to DefectDojo
-        uses: DefectDojo/django-DefectDojo-action@v0.0.5
+      - name: Publish report to DefectDojo
+        id: import-scan
+        uses: ivanamat/defectdojo-import-scan@v1
         with:
+          token: '76765e6652d7a8f6dd9a58a34795a1e5f712c2f4'  
           defectdojo_url: 'http://44.222.200.38:8080'
-          defectdojo_api_key: "76765e6652d7a8f6dd9a58a34795a1e5f712c2f4"
-          defectdojo_product_name: 'service1'
-          defectdojo_engagement_name: 'CI/CD Scan'
-          defectdojo_scan_type: 'Trivy Scan'
-          defectdojo_file: 'trivy-report.json'
+          file: 'trivy-scan-report.json'
+          scan_type: 'Trivy Scan'
+          # engagement: '1'  # Replace with your actual engagement ID
+
+      - name: Show response
+        run: |
+          set -e
+          printf '%s\n' '${{ steps.import-scan.outputs.response }}'
